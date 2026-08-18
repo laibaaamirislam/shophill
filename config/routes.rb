@@ -11,4 +11,15 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
+
+  scope module: :customers do
+    resource :session, only: [:new, :create, :destroy], path: "login"
+    resource :registration, only: [:new, :create], path: "register"
+    resource :account, only: [:edit, :update]
+  end
+
+  namespace :admin do
+    resource :session, only: [:new, :create, :destroy], path: "login"
+  end
+
 end
