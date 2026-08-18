@@ -1,9 +1,15 @@
 Rails.application.routes.draw do
+  get "checkouts/new"
+  get "checkouts/create"
+  get "checkouts/show"
   root "products#index"
 
   resources :products, only: [:index, :show]
   resource :cart, only: [:show]
   resources :cart_items, only: [:create, :update, :destroy]
+
+  resources :checkouts, only: [:new, :create, :show]
+  resources :orders, only: [:index, :show]
 
   scope module: :customers do
     get "register", to: "registrations#new", as: :register

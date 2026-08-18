@@ -1,0 +1,44 @@
+<h1>Checkout Review</h1>
+
+<div class="row mt-4">
+  <div class="col-md-8">
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="mb-0">Order Summary</h5>
+      </div>
+      <div class="card-body">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @cart.cart_items.each do |item| %>
+              <tr>
+                <td><%= item.product.name %></td>
+                <td>$<%= "%.2f" % item.product.price %></td>
+                <td><%= item.quantity %></td>
+                <td>$<%= "%.2f" % ((item.quantity * item.product.price_cents) / 100.0) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Total Payment</h4>
+        <h2 class="text-success my-3">$<%= "%.2f" % (@cart.total_cents / 100.0) %></h2>
+        
+        <%= button_to "Place Order", checkouts_path, method: :post, class: "btn btn-success btn-lg w-100" %>
+      </div>
+    </div>
+  </div>
+</div>
