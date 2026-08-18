@@ -1,0 +1,28 @@
+<h1>Orders</h1>
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Customer</th>
+      <th>Total</th>
+      <th>Status</th>
+      <th>Date</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @orders.each do |order| %>
+      <tr>
+        <td>#<%= order.id %></td>
+        <td><%= order.customer&.email %></td>
+        <td>$<%= "%.2f" % (order.total_cents / 100.0) %></td>
+        <td><span class="badge bg-info"><%= order.status %></span></td>
+        <td><%= order.created_at.strftime("%Y-%m-%d %H:%M") %></td>
+        <td><%= link_to "View", admin_order_path(order), class: "btn btn-sm btn-primary" %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= will_paginate @orders %>

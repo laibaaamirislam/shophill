@@ -1,0 +1,48 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1>Category: <%= @category.name %></h1>
+  <div>
+    <%= link_to "Edit Category", edit_admin_category_path(@category), class: "btn btn-secondary me-2" %>
+    <%= link_to "Back to Categories", admin_categories_path, class: "btn btn-outline-primary" %>
+  </div>
+</div>
+
+<p><strong>Slug:</strong> <%= @category.slug %></p>
+
+<h3 class="mt-4">Products in this Category</h3>
+
+<% if @products.any? %>
+  <table class="table table-bordered align-middle">
+    <thead>
+      <tr>
+        <th>Image</th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Stock</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @products.each do |product| %>
+        <tr>
+          <td>
+            <% if product.images.attached? %>
+              <%= image_tag product.images.first, width: 50 %>
+            <% else %>
+              No Image
+            <% end %>
+          </td>
+          <td><%= product.name %></td>
+          <td>$<%= "%.2f" % product.price %></td>
+          <td><%= product.stock_quantity %></td>
+          <td>
+            <%= link_to "Edit Product", edit_admin_product_path(product), class: "btn btn-sm btn-primary" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <%= will_paginate @products %>
+<% else %>
+  <p class="text-muted">No products found in this category.</p>
+<% end %>

@@ -16,7 +16,9 @@ class ApplicationController < ActionController::Base
   end
 
   def set_current_admin
-    Current.admin = AdminUser.find_by(id: session[:admin_id])
+    if session[:admin_id]
+      Current.admin = AdminUser.find_by(id: session[:admin_id])
+    end
   end
 
   def require_customer_login

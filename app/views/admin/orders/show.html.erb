@@ -1,0 +1,20 @@
+<h1>Order #<%= @order.id %></h1>
+<p><strong>Customer:</strong> <%= @order.customer&.email %></p>
+<p><strong>Total:</strong> $<%= "%.2f" % (@order.total_cents / 100.0) %></p>
+
+<div class="mb-4">
+  <%= form_with model: [:admin, @order], local: true do |f| %>
+    <div class="d-flex align-items-center gap-2">
+      <%= f.label :status, "Status:", class: "form-label mb-0" %>
+      <%= f.select :status, Order.statuses.keys.map { |s| [s.titleize, s] }, {}, class: "form-select w-auto" %>
+      <%= f.submit "Update Status", class: "btn btn-sm btn-primary" %>
+    </div>
+  <% end %>
+</div>
+
+<h3>Items</h3>
+<ul>
+  <% @order.order_items.each do |item| %>
+    <li><%= item.product.name %> - <%= item.quantity %> x $<%= "%.2f" % (item.unit_price_cents / 100.0) %></li>
+  <% end %>
+</ul>
