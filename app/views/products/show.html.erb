@@ -1,4 +1,25 @@
-<div>
-  <h1 class="font-bold text-4xl">Products#show</h1>
-  <p>Find me in app/views/products/show.html.erb</p>
+<div class="row mt-4">
+  <div class="col-md-6">
+    <% if @product.images.attached? %>
+      <div class="d-flex flex-wrap gap-2">
+        <% @product.images.each do |img| %>
+          <%= image_tag img, class: "img-fluid rounded border mb-2", style: "max-height: 300px; object-fit: cover;" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+  <div class="col-md-6">
+    <h1><%= @product.name %></h1>
+    <h3 class="text-success">$<%= "%.2f" % @product.price %></h3>
+    <p><%= @product.description %></p>
+
+    <%= form_with url: cart_items_path, method: :post, local: true do |f| %>
+      <%= hidden_field_tag :product_id, @product.id %>
+      <div class="mb-3">
+        <%= f.label :quantity, "Quantity:", class: "form-label" %>
+        <%= f.number_field :quantity, value: 1, min: 1, max: @product.stock_quantity, class: "form-control w-25" %>
+      </div>
+      <%= f.submit "Add to Cart", class: "btn btn-success" %>
+    <% end %>
+  </div>
 </div>
