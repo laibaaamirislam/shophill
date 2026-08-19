@@ -1,43 +1,85 @@
-<h1>Checkout Review</h1>
+<div class="d-flex align-items-center justify-content-between mb-4">
+  <h3 class="fw-bold text-dark m-0">Checkout</h3>
+  <%= link_to "← Back to Cart", cart_path, class: "text-secondary text-decoration-none fw-semibold small" %>
+</div>
 
-<div class="row mt-4">
-  <div class="col-md-8">
-    <div class="card mb-4">
-      <div class="card-header">
-        <h5 class="mb-0">Order Summary</h5>
-      </div>
-      <div class="card-body">
-        <table class="table align-middle">
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th>Price</th>
-              <th>Quantity</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @cart.cart_items.each do |item| %>
-              <tr>
-                <td><%= item.product.name %></td>
-                <td>$<%= "%.2f" % item.product.price %></td>
-                <td><%= item.quantity %></td>
-                <td>$<%= "%.2f" % ((item.quantity * item.product.price_cents) / 100.0) %></td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
+<div class="row g-4">
+  <!-- Shipping Information Form -->
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+      <h5 class="fw-bold text-dark mb-4">Shipping Details</h5>
+
+      <%= form_with model: @order, url: checkouts_path, local: true do |f| %>
+        <% if @order.errors.any? %>
+          <div class="alert alert-danger rounded-3 mb-4">
+            <ul class="mb-0 ps-3">
+              <% @order.errors.full_messages.each do |msg| %>
+                <li><%= msg %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div class="mb-3">
+          <%= f.label :shipping_address, "Street Address", class: "form-label fw-semibold small text-secondary" %>
+          <%= f.text_field :shipping_address, class: "form-control rounded-3 py-2", placeholder: "123 Main St", required: true %>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <%= f.label :city, class: "form-label fw-semibold small text-secondary" %>
+            <%= f.text_field :city, class: "form-control rounded-3 py-2", required: true %>
+          </div>
+          <div class="col-md-6">
+            <%= f.label :postal_code, "Postal Code", class: "form-label fw-semibold small text-secondary" %>
+            <%= f.text_field :postal_code, class: "form-control rounded-3 py-2", required: true %>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <%= f.label :phone, "Phone Number", class: "form-label fw-semibold small text-secondary" %>
+          <%= f.telephone_field :phone, class: "form-control rounded-3 py-2", placeholder: "+1 (555) 000-0000", required: true %>
+        </div>
+
+        <%= f.submit "Place Order", class: "btn btn-dark rounded-pill w-100 py-2.5 fw-semibold shadow-sm" %>
+      <% end %>
     </div>
   </div>
 
-  <div class="col-md-4">
-    <div class="card">
-      <div class="card-body">
-        <h4 class="card-title">Total Payment</h4>
-        <h2 class="text-success my-3">$<%= "%.2f" % (@cart.total_cents / 100.0) %></h2>
-        
-        <%= button_to "Place Order", checkouts_path, method: :post, class: "btn btn-success btn-lg w-100" %>
+  <!-- Order Items Summary -->
+  <div class="col-lg-5">
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4 position-sticky" style="top: 20px;">
+      <h5 class="fw-bold text-dark mb-4">Items Summary</h5>
+
+      <div class="d-flex flex-column gap-3 mb-4">
+        <% @cart.cart_items.each do |item| %>
+          <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+              <div class="bg-light rounded-3 d-flex align-items-center justify-content-center overflow-hidden flex-shrink-0" style="width: 48px; height: 48px;">
+                <% if item.product.respond_to?(:images) && item.product.images.attached? %>
+                  <%= image_tag item.product.images.first, class: "w-100 h-100 object-fit-cover" %>
+                <% elsif item.product.respond_to?(:image) && item.product.image.attached? %>
+                  <%= image_tag item.product.image, class: "w-100 h-100 object-fit-cover" %>
+                <% else %>
+                  <span class="text-muted small">No Image</span>
+                <% end %>
+              </div>
+              <div>
+                <h6 class="fw-bold text-dark mb-0 text-truncate" style="max-width: 150px;"><%= item.product.name %></h6>
+                <small class="text-muted">Qty: <%= item.quantity %></small>
+              </div>
+            </div>
+            <span class="fw-bold text-dark small">$<%= "%.2f" % ((item.product.price_cents.to_i * item.quantity) / 100.0) %></span>
+          </div>
+        <% end %>
+      </div>
+
+      <hr class="my-3 text-muted">
+
+      <% subtotal_cents = @cart.cart_items.sum { |i| i.product.price_cents.to_i * i.quantity } %>
+      <div class="d-flex justify-content-between align-items-center">
+        <span class="fw-bold text-dark fs-5">Total</span>
+        <span class="fw-bold text-dark fs-4">$<%= "%.2f" % (subtotal_cents / 100.0) %></span>
       </div>
     </div>
   </div>

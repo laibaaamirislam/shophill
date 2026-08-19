@@ -33,12 +33,19 @@
 </div>
 
 <!-- Products Grid (Admin Managed Data) -->
+<!-- Products Grid -->
 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 mb-5">
   <% @products.each do |product| %>
+    <% 
+      # Calculate current quantity of this product already in cart
+      cart_item = Current.customer&.cart&.cart_items&.find { |ci| ci.product_id == product.id }
+      qty_in_cart = cart_item&.quantity || 0
+      max_reached = qty_in_cart >= product.stock_quantity.to_i
+    %>
     <div class="col">
       <div class="card border-0 shadow-sm rounded-4 h-100 bg-white overflow-hidden d-flex flex-column justify-content-between">
         <div>
-          <!-- Product Image (ActiveStorage or Fallback) -->
+          <!-- Product Image -->
           <div class="bg-light rounded-3 m-2 d-flex align-items-center justify-content-center position-relative overflow-hidden" style="height: 180px;">
             <% if product.respond_to?(:images) && product.images.attached? %>
               <%= image_tag product.images.first, class: "w-100 h-100 object-fit-cover" %>
@@ -46,27 +53,34 @@
               <span class="text-muted small">No Image</span>
             <% end %>
 
-            <!-- Automated Stock Badges -->
+            <!-- Stock Badges -->
             <% if product.stock_quantity.to_i <= 0 %>
               <span class="badge bg-secondary position-absolute top-0 start-0 m-2">Out of Stock</span>
+            <% elsif max_reached %>
+              <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2">Max in Cart</span>
             <% elsif product.stock_quantity.to_i <= 5 %>
               <span class="badge bg-danger position-absolute top-0 start-0 m-2">Low Stock</span>
             <% end %>
           </div>
 
-          <!-- Product Meta -->
+          <!-- Product Details -->
           <div class="p-3">
             <h6 class="fw-bold text-dark mb-1 text-truncate"><%= product.name %></h6>
             <div class="text-muted small"><%= product.category&.name || "Uncategorized" %></div>
           </div>
         </div>
 
-        <!-- Pricing & Action -->
+        <!-- Pricing & Add Button -->
         <div class="p-3 pt-0 d-flex align-items-center justify-content-between">
           <span class="fw-bold fs-5 text-dark">$<%= "%.2f" % (product.price_cents.to_i / 100.0) %></span>
-          <%= button_to "Add", cart_items_path(product_id: product.id), class: "btn btn-dark btn-sm rounded-pill px-3 fw-semibold", disabled: product.stock_quantity.to_i <= 0 %>
+          
+          <%= button_to (max_reached ? "Maxed" : "Add"), 
+                        cart_items_path(product_id: product.id), 
+                        class: "btn btn-dark btn-sm rounded-pill px-3 fw-semibold", 
+                        disabled: product.stock_quantity.to_i <= 0 || max_reached %>
         </div>
       </div>
     </div>
   <% end %>
 </div>
+
