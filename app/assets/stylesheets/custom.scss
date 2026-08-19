@@ -1,0 +1,159 @@
+
+// CUSTOM VARIABLES & TOKENS
+$bg-main: #f8f9fa;
+$bg-card: #ffffff;
+$bg-placeholder: #f3f4f6;
+
+$text-dark: #111827;
+$text-muted: #6b7280;
+$border-light: #e5e7eb;
+
+$accent-dark: #111827;
+$accent-hover: #1f2937;
+$accent-red: #ff4d4f;
+
+$radius-card: 16px;
+$radius-pill: 50px;
+$shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.03);
+$shadow-hover: 0 12px 24px rgba(0, 0, 0, 0.08);
+
+
+// GLOBAL OVERRIDES
+
+body {
+  background-color: $bg-main;
+  color: $text-dark;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+
+// NAVBAR & HEADER
+
+.navbar-custom {
+  background: $bg-card;
+  border-bottom: 1px solid $border-light;
+  padding: 1rem 0;
+
+  .search-input {
+    background-color: $bg-main;
+    border: 1px solid $border-light;
+    border-radius: $radius-pill;
+    padding: 0.5rem 1.25rem;
+    color: $text-dark;
+
+    &:focus {
+      background-color: $bg-card;
+      border-color: $accent-dark;
+      box-shadow: none;
+    }
+  }
+
+  .btn-cart-badge {
+    border-radius: $radius-pill;
+    border: 1px solid $border-light;
+    color: $text-dark;
+    font-weight: 500;
+  }
+}
+
+//  BANNER & CATEGORY CIRCLES
+
+.hero-banner {
+  background: $bg-card;
+  border-radius: $radius-card;
+  border: 1px solid $border-light;
+  padding: 2.5rem;
+  box-shadow: $shadow-soft;
+}
+
+.category-circle-btn {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: $bg-card;
+  border: 1px solid $border-light;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 8px;
+  transition: all 0.2s ease-in-out;
+  box-shadow: $shadow-soft;
+  text-decoration: none;
+  color: $text-dark;
+
+  &:hover {
+    background: $accent-dark;
+    color: #ffffff;
+    border-color: $accent-dark;
+  }
+}
+
+//  PRODUCT CARDS & GRID
+
+.product-card {
+  background: $bg-card;
+  border-radius: $radius-card;
+  border: 1px solid $border-light;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-hover;
+  }
+
+  .card-img-wrapper {
+    background-color: $bg-placeholder;
+    border-radius: 12px;
+    height: 190px;
+    margin: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .btn-dark-pill {
+    background-color: $accent-dark;
+    color: #ffffff;
+    border-radius: $radius-pill;
+    font-weight: 600;
+    padding: 0.4rem 1.2rem;
+    border: none;
+
+    &:hover {
+      background-color: $accent-hover;
+      color: #ffffff;
+    }
+
+    &:disabled {
+      background-color: $border-light;
+      color: $text-muted;
+    }
+  }
+}
+
+// CART, CHECKOUT & ORDERS PANELS
+
+.custom-card-panel {
+  background: $bg-card;
+  border-radius: $radius-card;
+  border: 1px solid $border-light;
+  padding: 1.5rem;
+  box-shadow: $shadow-soft;
+}
+
+.table-custom {
+  th {
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    color: $text-muted;
+    border-bottom: 1px solid $border-light;
+  }
+
+  td {
+    vertical-align: middle;
+    padding: 1rem 0.5rem;
+  }
+}

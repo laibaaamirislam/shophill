@@ -1,0 +1,30 @@
+<h1>My Orders</h1>
+
+<% if @orders.empty? %>
+  <p>You haven't placed any orders yet. <%= link_to "Start Shopping", products_path %></p>
+<% else %>
+  <table class="table table-striped align-middle mt-3">
+    <thead>
+      <tr>
+        <th>Order #</th>
+        <th>Date</th>
+        <th>Status</th>
+        <th>Total</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @orders.each do |order| %>
+        <tr>
+          <td>#<%= order.id %></td>
+          <td><%= order.created_at.strftime("%b %d, %Y") %></td>
+          <td><span class="badge bg-info text-dark"><%= order.status.titleize %></span></td>
+          <td>$<%= "%.2f" % (order.total_cents / 100.0) %></td>
+          <td><%= link_to "Details", order_path(order), class: "btn btn-sm btn-outline-primary" %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <%= will_paginate @orders %>
+<% end %>

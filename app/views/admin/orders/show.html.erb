@@ -1,20 +1,41 @@
-<h1>Order #<%= @order.id %></h1>
-<p><strong>Customer:</strong> <%= @order.customer&.email %></p>
-<p><strong>Total:</strong> $<%= "%.2f" % (@order.total_cents / 100.0) %></p>
-
-<div class="mb-4">
-  <%= form_with model: [:admin, @order], local: true do |f| %>
-    <div class="d-flex align-items-center gap-2">
-      <%= f.label :status, "Status:", class: "form-label mb-0" %>
-      <%= f.select :status, Order.statuses.keys.map { |s| [s.titleize, s] }, {}, class: "form-select w-auto" %>
-      <%= f.submit "Update Status", class: "btn btn-sm btn-primary" %>
-    </div>
-  <% end %>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>Admin Order #<%= @order.id %></h1>
+  <%= link_to "Back to Admin Orders", admin_orders_path, class: "btn btn-outline-secondary" %>
 </div>
 
-<h3>Items</h3>
-<ul>
-  <% @order.order_items.each do |item| %>
-    <li><%= item.product.name %> - <%= item.quantity %> x $<%= "%.2f" % (item.unit_price_cents / 100.0) %></li>
-  <% end %>
-</ul>
+<div class="row">
+  <div class="col-md-8">
+    <div class="card mb-4">
+      <div class="card-header">Order Items</div>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+          <% @order.order_items.each do |item| %>
+            <li class="list-group-item d-flex justify-content-between">
+              <div>
+                <strong><%= item.product.name %></strong>
+                <small class="text-muted d-block">Qty: <%= item.quantity %></small>
+              </div>
+              <span>$<%= "%.2f" % ((item.quantity * item.unit_price_cents) / 100.0) %></span>
+            </li>
+          <% end %>
+        </ul>
+        <h4 class="text-end mt-3">Total: $<%= "%.2f" % (@order.total_cents / 100.0) %></h4>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">Update Order Status</div>
+      <div class="card-body">
+        <%= form_with model: [:admin, @order], method: :patch, local: true do |f| %>
+          <div class="mb-3">
+            <%= f.label :status, "Current Status:", class: "form-label" %>
+            <%= f.select :status, ["pending", "processing", "shipped", "delivered", "cancelled"], {}, class: "form-select" %>
+          </div>
+          <%= f.submit "Update Status", class: "btn btn-primary w-100" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

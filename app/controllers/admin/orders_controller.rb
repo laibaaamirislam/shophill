@@ -1,3 +1,4 @@
+# app/controllers/admin/orders_controller.rb
 class Admin::OrdersController < Admin::BaseController
   before_action :set_order, only: [:show, :update]
 
@@ -9,9 +10,9 @@ class Admin::OrdersController < Admin::BaseController
 
   def update
     if @order.update(order_params)
-      redirect_to admin_order_path(@order), notice: "Order updated successfully."
+      redirect_to admin_order_path(@order), notice: "Order status updated to #{@order.status.titleize}."
     else
-      render :show, status: :unprocessable_entity
+      redirect_to admin_order_path(@order), alert: "Failed to update order status."
     end
   end
 

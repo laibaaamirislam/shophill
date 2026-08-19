@@ -12,12 +12,16 @@ Rails.application.routes.draw do
   resources :orders, only: [:index, :show]
 
   scope module: :customers do
-    get "register", to: "registrations#new", as: :register
-    get "login", to: "sessions#new", as: :login
+   get "register", to: "registrations#new", as: :register
+  post "register", to: "registrations#create"
 
-    resource :session, only: [:new, :create, :destroy], path: "login"
-    resource :registration, only: [:new, :create], path: "register"
-    resource :account, only: [:edit, :update]
+  get "login", to: "sessions#new", as: :login
+  post "login", to: "sessions#create"
+  delete "logout", to: "sessions#destroy", as: :logout
+
+  resource :session, only: [:new, :create, :destroy], path: "login"
+  resource :account, only: [:edit, :update]
+
   end
 
   namespace :admin do
