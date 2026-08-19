@@ -1,34 +1,30 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+<nav class="navbar navbar-expand-lg bg-white border-bottom py-3 mb-4">
   <div class="container">
-    <%= link_to "Shophill", root_path, class: "navbar-brand fw-bold" %>
-    
-    <div class="collapse navbar-collapse">
-      <ul class="navbar-brand navbar-nav me-auto">
-        <li class="nav-item">
-          <%= link_to "Products", products_path, class: "nav-link" %>
-        </li>
-      </ul>
+    <%= link_to "Shophill", root_path, class: "navbar-brand fw-bold fs-4 text-dark me-4" %>
 
-      <ul class="navbar-nav ms-auto align-items-center gap-2">
-        <% if Current.customer %>
-          <li class="nav-item">
-            <%= link_to "Cart (#{(Current.customer.cart&.cart_items&.sum(:quantity) || 0)})", cart_path, class: "btn btn-outline-light btn-sm" %>
-          </li>
-          <li class="nav-item">
-            <%= link_to "My Orders", orders_path, class: "nav-link" %>
-          </li>
-          <li class="nav-item">
-            <%= button_to "Logout", logout_path, method: :delete, class: "btn btn-sm btn-link nav-link d-inline" %>
-          </li>
-        <% else %>
-          <li class="nav-item">
-            <%= link_to "Log In", login_path, class: "nav-link" %>
-          </li>
-          <li class="nav-item">
-            <%= link_to "Register", register_path, class: "btn btn-primary btn-sm" %>
-          </li>
+    <div class="d-flex flex-grow-1 me-4">
+      <%= form_with url: products_path, method: :get, local: true, class: "w-100" do |f| %>
+        <% if params[:category_id].present? %>
+          <%= f.hidden_field :category_id, value: params[:category_id] %>
         <% end %>
-      </ul>
+        <%= f.text_field :query, value: params[:query], placeholder: "Search products...", class: "form-control bg-light border-0 rounded-pill px-4" %>
+      <% end %>
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+      <% if Current.customer %>
+        <%= link_to cart_path, class: "btn btn-outline-dark rounded-pill position-relative px-3" do %>
+          🛒 Cart
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            <%= Current.customer.cart&.cart_items&.sum(:quantity) || 0 %>
+          </span>
+        <% end %>
+        <%= link_to "Orders", orders_path, class: "btn btn-link text-dark text-decoration-none fw-semibold" %>
+        <%= button_to "Logout", logout_path, method: :delete, class: "btn btn-sm btn-light rounded-pill px-3" %>
+      <% else %>
+        <%= link_to "Log In", login_path, class: "btn btn-link text-dark text-decoration-none fw-semibold" %>
+        <%= link_to "Register", register_path, class: "btn btn-dark rounded-pill px-4 fw-semibold" %>
+      <% end %>
     </div>
   </div>
 </nav>

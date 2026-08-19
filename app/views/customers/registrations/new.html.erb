@@ -4,7 +4,7 @@
       <div class="card-body">
         <h2 class="card-title text-center mb-4">Customer Registration</h2>
 
-        <%= form_with model: @customer, url: registration_path, local: true do |f| %>
+        <%= form_with model: @customer, url: register_path, local: true do |f| %>
           <% if @customer.errors.any? %>
             <div class="alert alert-danger">
               <ul class="mb-0">
