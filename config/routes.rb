@@ -30,9 +30,14 @@ Rails.application.routes.draw do
   namespace :admin do
     root to: "dashboard#index"
     resource :session, only: [:new, :create, :destroy], path: "login"
-    resources :products
     resources :categories
     resources :orders, only: [:index, :show, :update]
+
+    resources :products do
+      member do
+        patch :toggle_active
+      end
+    end
   end
 
 end

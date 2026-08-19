@@ -1,44 +1,71 @@
-
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h1>Products</h1>
-  <%= link_to "New Product", new_admin_product_path, class: "btn btn-success" %>
+<div class="d-flex align-items-center justify-content-between mb-4">
+  <div>
+    <h3 class="fw-bold text-dark m-0">Product Catalog</h3>
+    <p class="text-secondary small m-0">Manage product details, inventory stock, and visibility</p>
+  </div>
+  <%= link_to "+ Add Product", new_admin_product_path, class: "btn btn-dark rounded-pill px-4 fw-semibold" %>
 </div>
 
-<table class="table table-bordered">
-  <thead>
-    <tr>
-      <th>Image</th>
-      <th>Name</th>
-      <th>Category</th>
-      <th>Price</th>
-      <th>Stock</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @products.each do |product| %>
-      <tr>
-        <td>
-          <% if product.images.attached? %>
-            <%= image_tag product.images.first, width: 50 %>
-          <% else %>
-            No Image
-          <% end %>
-        </td>
-        <td><%= product.name %></td>
-        <td><%= product.category&.name %></td>
-        <td>$<%= "%.2f" % (product.price_cents / 100.0) %></td>
-        <td><%= product.stock_quantity %></td>
-          <td>
-            <%= link_to "View", admin_product_path(product), class: "btn btn-sm btn-info me-1" %>
-            <%= link_to "Edit", edit_admin_product_path(product), class: "btn btn-sm btn-primary me-1" %>
-            <%= button_to "Delete", admin_product_path(product), 
-                          method: :delete, 
-                          form: { data: { turbo_confirm: "Are you sure you want to delete this product?" } }, 
-                          class: "btn btn-sm btn-danger d-inline" %>
-          </td>
-        </td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+<div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead>
+        <tr class="text-secondary small text-uppercase">
+          <th>Product</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Status</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @products.each do |product| %>
+          <tr class="<%= 'table-light opacity-75' unless product.active? %>">
+            <td>
+              <div class="d-flex align-items-center gap-3">
+                <% if product.images.attached? %>
+                  <%= image_tag product.images.first, class: "rounded-3 object-fit-cover border", size: "48x48" %>
+                <% else %>
+                  <div class="bg-light rounded-3 d-flex align-items-center justify-content-center text-muted small border" style="width: 48px; height: 48px;">
+                    No image
+                  </div>
+                <% end %>
+                <div>
+                  <h6 class="fw-bold text-dark mb-0 small"><%= product.name %></h6>
+                  <small class="text-muted"><%= product.category&.name || "Uncategorized" %></small>
+                </div>
+              </div>
+            </td>
+            <td class="small text-secondary"><%= product.category&.name %></td>
+            <td class="fw-bold text-dark">$<%= "%.2f" % product.price %></td>
+            <td>
+              <% if product.active? %>
+                <span class="badge bg-success-subtle text-success-emphasis rounded-pill px-3 py-1">Active</span>
+              <% else %>
+                <span class="badge bg-secondary-subtle text-secondary-emphasis rounded-pill px-3 py-1">Archived</span>
+              <% end %>
+            </td>
+            <td class="text-end">
+              <div class="d-flex align-items-center justify-content-end gap-2">
+                <%= link_to "Edit", edit_admin_product_path(product), class: "btn btn-sm btn-outline-dark rounded-pill px-3" %>
+                
+                <% if product.active? %>
+                  <%= button_to "Archive", 
+                                toggle_active_admin_product_path(product), 
+                                method: :patch, 
+                                onclick: "return confirm('Archive #{j product.name}? It will be hidden from the storefront.');", 
+                                class: "btn btn-sm btn-outline-warning rounded-pill px-3" %>
+                <% else %>
+                  <%= button_to "Unarchive", 
+                                toggle_active_admin_product_path(product), 
+                                method: :patch, 
+                                class: "btn btn-sm btn-success rounded-pill px-3" %>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

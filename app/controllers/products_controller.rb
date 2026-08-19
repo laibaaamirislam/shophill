@@ -1,7 +1,8 @@
 class ProductsController < ApplicationController
   def index
     @categories = Category.all
-    @products = Product.all
+    @products = Product.where(active: true)
+
 
     # Filter by category
     if params[:category_id].present?
