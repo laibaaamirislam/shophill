@@ -1,0 +1,102 @@
+<div class="d-flex align-items-center justify-content-between mb-4">
+  <h3 class="fw-bold text-dark m-0">Store Overview</h3>
+  <span class="text-secondary small">Last updated: <%= Time.current.strftime("%B %d, %Y") %></span>
+</div>
+
+<!-- Key Performance Metric Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+      <small class="text-secondary fw-semibold">Total Revenue</small>
+      <h3 class="fw-bold text-dark mt-2 mb-0">$<%= "%.2f" % (@total_revenue_cents.to_i / 100.0) %></h3>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+      <small class="text-secondary fw-semibold">Total Orders</small>
+      <h3 class="fw-bold text-dark mt-2 mb-0"><%= @total_orders %></h3>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+      <small class="text-secondary fw-semibold">Pending Orders</small>
+      <h3 class="fw-bold text-warning mt-2 mb-0"><%= @pending_orders_count %></h3>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+      <small class="text-secondary fw-semibold">Registered Customers</small>
+      <h3 class="fw-bold text-dark mt-2 mb-0"><%= @total_customers %></h3>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Recent Orders Table -->
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h5 class="fw-bold text-dark m-0">Recent Orders</h5>
+        <%= link_to "View All", admin_orders_path, class: "text-dark text-decoration-none small fw-semibold" %>
+      </div>
+
+      <% if @recent_orders.empty? %>
+        <p class="text-muted text-center py-3 m-0">No orders placed yet.</p>
+      <% else %>
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead>
+              <tr class="text-secondary small text-uppercase">
+                <th>Order #</th>
+                <th>Customer</th>
+                <th>Status</th>
+                <th>Total</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @recent_orders.each do |order| %>
+                <tr>
+                  <td class="fw-bold text-dark">#<%= order.id %></td>
+                  <td class="small"><%= order.customer&.email || "Guest" %></td>
+                  <td>
+                    <span class="badge <%= order.status == 'shipped' ? 'bg-info-subtle text-info-emphasis' : order.status == 'completed' ? 'bg-success-subtle text-success-emphasis' : 'bg-warning-subtle text-warning-emphasis' %> rounded-pill px-2.5 py-1 text-uppercase small">
+                      <%= order.status %>
+                    </span>
+                  </td>
+                  <td class="fw-bold text-dark">$<%= "%.2f" % (order.total_cents.to_i / 100.0) %></td>
+                  <td class="text-end">
+                    <%= link_to "Details", admin_order_path(order), class: "btn btn-sm btn-outline-dark rounded-pill px-3" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Low Stock Warning Sidebar -->
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+      <h5 class="fw-bold text-dark mb-3">Low Stock Alerts</h5>
+
+      <% if @low_stock_products.empty? %>
+        <p class="text-muted small m-0">All products have sufficient stock levels.</p>
+      <% else %>
+        <div class="d-flex flex-column gap-3">
+          <% @low_stock_products.each do |product| %>
+            <div class="d-flex align-items-center justify-content-between pb-2 border-bottom">
+              <div>
+                <h6 class="fw-bold text-dark mb-0 small"><%= product.name %></h6>
+                <small class="text-muted">Stock: <%= product.stock_quantity %> left</small>
+              </div>
+              <%= link_to "Edit", edit_admin_product_path(product), class: "btn btn-sm btn-outline-secondary rounded-pill px-2 py-0 small" %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

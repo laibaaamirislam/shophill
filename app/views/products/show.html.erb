@@ -56,7 +56,7 @@
 
         <div>
           <%= f.submit (max_reached ? "Max Quantity in Cart" : "Add to Cart"), 
-                       class: "btn btn-dark rounded-pill w-100 py-2.5 fw-semibold shadow-sm", 
+                       class: "btn btn-dark rounded-pill w-100 px-3 fw-semibold shadow-sm", 
                        disabled: @product.stock_quantity.to_i <= 0 || max_reached %>
         </div>
       <% end %>

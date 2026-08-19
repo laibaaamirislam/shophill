@@ -28,10 +28,11 @@ Rails.application.routes.draw do
   end
 
   namespace :admin do
+    root to: "dashboard#index"
     resource :session, only: [:new, :create, :destroy], path: "login"
     resources :products
     resources :categories
     resources :orders, only: [:index, :show, :update]
-    root to: "products#index"
   end
+
 end

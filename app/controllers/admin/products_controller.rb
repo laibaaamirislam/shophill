@@ -31,8 +31,11 @@ class Admin::ProductsController < Admin::BaseController
   end
 
   def destroy
-    @product.destroy
-    redirect_to admin_products_path, notice: "Product deleted successfully."
+    if @product.destroy
+      redirect_to admin_products_path, notice: "Product deleted successfully."
+    else
+      render :edit, status: :unprocessable_entity
+    end
   end
 
   private
