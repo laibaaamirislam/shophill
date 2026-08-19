@@ -1,0 +1,64 @@
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4 p-md-5 mb-5">
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+          <h3 class="fw-bold text-dark mb-1">My Account Profile</h3>
+          <p class="text-secondary small mb-0">Manage your personal information and default shipping preferences.</p>
+        </div>
+        <%= link_to "View Orders", orders_path, class: "btn btn-outline-dark rounded-pill btn-sm px-3 fw-semibold" %>
+      </div>
+
+      <%= form_with model: @customer, url: profile_path, method: :patch, local: true do |f| %>
+        <% if @customer.errors.any? %>
+          <div class="alert alert-danger rounded-3 mb-4">
+            <ul class="mb-0 ps-3">
+              <% @customer.errors.full_messages.each do |msg| %>
+                <li><%= msg %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <%= f.label :name, "Full Name", class: "form-label fw-semibold small text-secondary" %>
+            <%= f.text_field :name, class: "form-control rounded-3 py-2", required: true %>
+          </div>
+          <div class="col-md-6">
+            <%= f.label :email, "Email Address", class: "form-label fw-semibold small text-secondary" %>
+            <%= f.email_field :email, class: "form-control rounded-3 py-2", required: true %>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <%= f.label :phone, "Phone Number", class: "form-label fw-semibold small text-secondary" %>
+          <%= f.telephone_field :phone, class: "form-control rounded-3 py-2", placeholder: "+1 (555) 000-0000" %>
+        </div>
+
+        <hr class="my-4 text-muted">
+        <h6 class="fw-bold text-dark mb-3">Default Shipping Address</h6>
+
+        <div class="mb-3">
+          <%= f.label :address, "Street Address", class: "form-label fw-semibold small text-secondary" %>
+          <%= f.text_field :address, class: "form-control rounded-3 py-2", placeholder: "123 Main St" %>
+        </div>
+
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <%= f.label :city, class: "form-label fw-semibold small text-secondary" %>
+            <%= f.text_field :city, class: "form-control rounded-3 py-2" %>
+          </div>
+          <div class="col-md-6">
+            <%= f.label :postal_code, "Postal Code", class: "form-label fw-semibold small text-secondary" %>
+            <%= f.text_field :postal_code, class: "form-control rounded-3 py-2" %>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end">
+          <%= f.submit "Save Changes", class: "btn btn-dark rounded-pill px-4 py-2 fw-semibold shadow-sm" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

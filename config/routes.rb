@@ -11,16 +11,19 @@ Rails.application.routes.draw do
   resources :checkouts, only: [:new, :create, :show]
   resources :orders, only: [:index, :show]
 
+  resource :profile, only: [:show, :update]
+
   scope module: :customers do
-   get "register", to: "registrations#new", as: :register
-  post "register", to: "registrations#create"
 
-  get "login", to: "sessions#new", as: :login
-  post "login", to: "sessions#create"
-  delete "logout", to: "sessions#destroy", as: :logout
+    get "register", to: "registrations#new", as: :register
+    post "register", to: "registrations#create"
 
-  resource :session, only: [:new, :create, :destroy], path: "login"
-  resource :account, only: [:edit, :update]
+    get "login", to: "sessions#new", as: :login
+    post "login", to: "sessions#create"
+    delete "logout", to: "sessions#destroy", as: :logout
+
+    resource :session, only: [:new, :create, :destroy], path: "login"
+    resource :account, only: [:edit, :update]
 
   end
 
