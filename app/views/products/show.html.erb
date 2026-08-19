@@ -1,25 +1,66 @@
-<div class="row mt-4">
-  <div class="col-md-6">
-    <% if @product.images.attached? %>
-      <div class="d-flex flex-wrap gap-2">
-        <% @product.images.each do |img| %>
-          <%= image_tag img, class: "img-fluid rounded border mb-2", style: "max-height: 300px; object-fit: cover;" %>
+<div class="mb-4">
+  <%= link_to "← Back to Products", products_path, class: "text-secondary text-decoration-none fw-semibold small" %>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4 bg-white p-4 p-md-5 mb-5">
+  <div class="row g-4 g-lg-5 align-items-center">
+    
+    <!-- Product Image Gallery -->
+    <div class="col-md-6">
+      <div class="bg-light rounded-4 d-flex align-items-center justify-content-center overflow-hidden position-relative" style="min-height: 380px;">
+        <% if @product.respond_to?(:images) && @product.images.attached? %>
+          <%= image_tag @product.images.first, class: "w-100 h-100 object-fit-cover" %>
+        <% elsif @product.respond_to?(:image) && @product.image.attached? %>
+          <%= image_tag @product.image, class: "w-100 h-100 object-fit-cover" %>
+        <% else %>
+          <span class="text-muted fs-4">No Image Available</span>
+        <% end %>
+
+        <!-- Stock Status Badge -->
+        <% if @product.stock_quantity.to_i <= 0 %>
+          <span class="badge bg-secondary position-absolute top-0 start-0 m-3 fs-6 px-3 py-2 rounded-pill">Out of Stock</span>
+        <% elsif @product.stock_quantity.to_i <= 5 %>
+          <span class="badge bg-danger position-absolute top-0 start-0 m-3 fs-6 px-3 py-2 rounded-pill">Low Stock (<%= @product.stock_quantity %> left)</span>
         <% end %>
       </div>
-    <% end %>
-  </div>
-  <div class="col-md-6">
-    <h1><%= @product.name %></h1>
-    <h3 class="text-success">$<%= "%.2f" % @product.price %></h3>
-    <p><%= @product.description %></p>
+    </div>
 
-    <%= form_with url: cart_items_path, method: :post, local: true do |f| %>
-      <%= hidden_field_tag :product_id, @product.id %>
-      <div class="mb-3">
-        <%= f.label :quantity, "Quantity:", class: "form-label" %>
-        <%= f.number_field :quantity, value: 1, min: 1, max: @product.stock_quantity, class: "form-control w-25" %>
-      </div>
-      <%= f.submit "Add to Cart", class: "btn btn-success" %>
-    <% end %>
+    <!-- Product Meta & Purchase Form -->
+    <div class="col-md-6">
+      <span class="badge bg-dark-subtle text-dark rounded-pill px-3 py-2 fw-semibold mb-2">
+        <%= @product.category&.name || "General" %>
+      </span>
+
+      <h2 class="fw-bold text-dark mb-2"><%= @product.name %></h2>
+      <div class="fs-3 fw-bold text-dark mb-4">$<%= "%.2f" % (@product.price_cents.to_i / 100.0) %></div>
+
+      <p class="text-secondary mb-4 leading-relaxed">
+        <%= @product.description.presence || "No product description provided." %>
+      </p>
+
+      <hr class="my-4 text-muted">
+
+      <% 
+        cart_item = Current.customer&.cart&.cart_items&.find { |ci| ci.product_id == @product.id }
+        qty_in_cart = cart_item&.quantity || 0
+        max_reached = qty_in_cart >= @product.stock_quantity.to_i
+      %>
+
+      <%= form_with url: cart_items_path, method: :post, local: true, class: "d-flex flex-column gap-3" do |f| %>
+        <%= f.hidden_field :product_id, value: @product.id %>
+
+        <div class="d-flex align-items-center gap-3">
+          <label class="fw-semibold text-secondary small">Quantity:</label>
+          <%= f.number_field :quantity, value: 1, min: 1, max: (@product.stock_quantity.to_i - qty_in_cart), class: "form-control rounded-pill text-center", style: "width: 90px;", disabled: @product.stock_quantity.to_i <= 0 || max_reached %>
+        </div>
+
+        <div>
+          <%= f.submit (max_reached ? "Max Quantity in Cart" : "Add to Cart"), 
+                       class: "btn btn-dark rounded-pill w-100 py-2.5 fw-semibold shadow-sm", 
+                       disabled: @product.stock_quantity.to_i <= 0 || max_reached %>
+        </div>
+      <% end %>
+    </div>
+
   </div>
 </div>

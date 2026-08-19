@@ -1,26 +1,64 @@
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <h1>Order #<%= @order.id %></h1>
-  <%= link_to "Back to Orders", orders_path, class: "btn btn-outline-secondary" %>
+<div class="card border-0 shadow-sm rounded-4 bg-white p-4 p-md-5 mb-4 text-center">
+  <div class="fs-1 text-success mb-2"></div>
+  <h3 class="fw-bold text-dark mb-1">Thank you for your order!</h3>
+  <p class="text-secondary small mb-3">Order #<%= @order.id %>, Placed on <%= @order.created_at.strftime("%B %d, %Y") %></p>
+  <div>
+    <span class="badge bg-warning-subtle text-warning-emphasis px-3 py-2 rounded-pill fw-semibold text-uppercase">
+      Status: <%= @order.status %>
+    </span>
+  </div>
 </div>
 
-<div class="card mb-4">
-  <div class="card-header d-flex justify-content-between">
-    <span><strong>Status:</strong> <%= @order.status.titleize %></span>
-    <span>Placed on <%= @order.created_at.strftime("%B %d, %Y at %I:%M %p") %></span>
-  </div>
-  <div class="card-body">
-    <h5>Items</h5>
-    <ul class="list-group list-group-flush mb-3">
-      <% @order.order_items.each do |item| %>
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          <div>
-            <strong><%= item.product.name %></strong>
-            <small class="text-muted d-block">Qty: <%= item.quantity %></small>
+<div class="row g-4">
+  <!-- Purchased Items -->
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+      <h5 class="fw-bold text-dark mb-4">Items Ordered</h5>
+
+      <div class="d-flex flex-column gap-3">
+        <% @order.order_items.each do |item| %>
+          <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
+            <div class="d-flex align-items-center gap-3">
+              <div class="bg-light rounded-3 d-flex align-items-center justify-content-center overflow-hidden flex-shrink-0" style="width: 56px; height: 56px;">
+                <% if item.product.respond_to?(:images) && item.product.images.attached? %>
+                  <%= image_tag item.product.images.first, class: "w-100 h-100 object-fit-cover" %>
+                <% else %>
+                  <span class="text-muted small">No Image Available</span>
+                <% end %>
+              </div>
+              <div>
+                <h6 class="fw-bold text-dark mb-0"><%= item.product.name %></h6>
+                <small class="text-muted">
+                  <%= item.quantity %> x $<%= "%.2f" % (item.unit_price_cents.to_i / 100.0) %>
+                </small>
+              </div>
+            </div>
+            <span class="fw-bold text-dark">
+              $<%= "%.2f" % ((item.unit_price_cents.to_i * item.quantity) / 100.0) %>
+            </span>
           </div>
-          <span>$<%= "%.2f" % ((item.quantity * item.unit_price_cents) / 100.0) %></span>
-        </li>
-      <% end %>
-    </ul>
-    <h4 class="text-end">Total: $<%= "%.2f" % (@order.total_cents / 100.0) %></h4>
+        <% end %>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mt-4 pt-2">
+        <span class="fw-bold fs-5 text-dark">Total Paid</span>
+        <span class="fw-bold fs-4 text-dark">$<%= "%.2f" % (@order.total_cents.to_i / 100.0) %></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shipping Info Sidebar -->
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+      <h5 class="fw-bold text-dark mb-3">Shipping Address</h5>
+      <p class="text-secondary mb-1"><%= @order.shipping_address %></p>
+      <p class="text-secondary mb-1"><%= @order.city %>, <%= @order.postal_code %></p>
+      <p class="text-secondary mb-0"><strong>Phone:</strong> <%= @order.phone %></p>
+
+      <hr class="my-4 text-muted">
+
+      <%= link_to "View All Orders", orders_path, class: "btn btn-outline-dark rounded-pill w-100 py-2 fw-semibold" %>
+      <%= link_to "Continue Shopping", products_path, class: "btn btn-link text-secondary w-100 text-decoration-none mt-2 small" %>
+    </div>
   </div>
 </div>

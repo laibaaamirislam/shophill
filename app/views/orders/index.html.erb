@@ -1,30 +1,47 @@
-<h1>My Orders</h1>
+<h3 class="fw-bold text-dark mb-4">My Orders</h3>
 
 <% if @orders.empty? %>
-  <p>You haven't placed any orders yet. <%= link_to "Start Shopping", products_path %></p>
+  <div class="card border-0 shadow-sm rounded-4 text-center py-5 bg-white">
+    <div class="fs-1 mb-2">📦</div>
+    <h5 class="fw-bold text-dark">No orders yet</h5>
+    <p class="text-secondary small">You haven't placed any orders with us so far.</p>
+    <div>
+      <%= link_to "Start Shopping", products_path, class: "btn btn-dark rounded-pill px-4 fw-semibold text-decoration-none" %>
+    </div>
+  </div>
 <% else %>
-  <table class="table table-striped align-middle mt-3">
-    <thead>
-      <tr>
-        <th>Order #</th>
-        <th>Date</th>
-        <th>Status</th>
-        <th>Total</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @orders.each do |order| %>
-        <tr>
-          <td>#<%= order.id %></td>
-          <td><%= order.created_at.strftime("%b %d, %Y") %></td>
-          <td><span class="badge bg-info text-dark"><%= order.status.titleize %></span></td>
-          <td>$<%= "%.2f" % (order.total_cents / 100.0) %></td>
-          <td><%= link_to "Details", order_path(order), class: "btn btn-sm btn-outline-primary" %></td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-
-  <%= will_paginate @orders %>
+  <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr class="text-secondary small text-uppercase">
+            <th>Order #</th>
+            <th>Date</th>
+            <th>Items</th>
+            <th>Status</th>
+            <th>Total</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @orders.each do |order| %>
+            <tr>
+              <td class="fw-bold text-dark">#<%= order.id %></td>
+              <td class="text-secondary small"><%= order.created_at.strftime("%b %d, %Y") %></td>
+              <td><%= order.order_items.sum(:quantity) %> items</td>
+              <td>
+                <span class="badge bg-warning-subtle text-warning-emphasis rounded-pill px-3 py-1 fw-semibold text-uppercase small">
+                  <%= order.status %>
+                </span>
+              </td>
+              <td class="fw-bold text-dark">$<%= "%.2f" % (order.total_cents.to_i / 100.0) %></td>
+              <td class="text-start">
+                <%= link_to "View Details", order_path(order), class: "btn btn-sm btn-outline-dark rounded-pill px-3 fw-semibold" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
 <% end %>
