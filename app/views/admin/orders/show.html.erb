@@ -1,40 +1,109 @@
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <h1>Admin Order #<%= @order.id %></h1>
-  <%= link_to "Back to Admin Orders", admin_orders_path, class: "btn btn-outline-secondary" %>
+<div class="d-flex align-items-center justify-content-between mb-4">
+  <div>
+    <h3 class="fw-bold text-dark m-0">Order #<%= @order.id %></h3>
+    <span class="text-secondary small">Placed on <%= @order.created_at.strftime("%B %d, %Y at %I:%M %p") %></span>
+  </div>
+  <div>
+    <% case @order.status %>
+    <% when "paid" %>
+      <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2 fw-semibold">Paid</span>
+    <% when "pending" %>
+      <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2 fw-semibold">Pending Payment</span>
+    <% when "shipped" %>
+      <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 fw-semibold">Shipped</span>
+    <% else %>
+      <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3 py-2 fw-semibold"><%= @order.status.titleize %></span>
+    <% end %>
+  </div>
 </div>
 
-<div class="row">
-  <div class="col-md-8">
-    <div class="card mb-4">
-      <div class="card-header">Order Items</div>
-      <div class="card-body">
-        <ul class="list-group list-group-flush">
-          <% @order.order_items.each do |item| %>
-            <li class="list-group-item d-flex justify-content-between">
-              <div>
-                <strong><%= item.product.name %></strong>
-                <small class="text-muted d-block">Qty: <%= item.quantity %></small>
+<div class="row g-4">
+  <!-- Left Column: Order Items & Shipping Details -->
+  <div class="col-lg-7">
+    <!-- Order Items Summary -->
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4 mb-4">
+      <h5 class="fw-bold text-dark mb-3">Items Purchased</h5>
+      <div class="d-flex flex-column gap-3">
+        <% @order.order_items.each do |item| %>
+          <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
+            <div class="d-flex align-items-center gap-3">
+              <div class="bg-light rounded-3 d-flex align-items-center justify-content-center overflow-hidden flex-shrink-0" style="width: 56px; height: 56px;">
+                <% if item.product.respond_to?(:images) && item.product.images.attached? %>
+                  <%= image_tag item.product.images.first, class: "w-100 h-100 object-fit-cover" %>
+                <% elsif item.product.respond_to?(:image) && item.product.image.attached? %>
+                  <%= image_tag item.product.image, class: "w-100 h-100 object-fit-cover" %>
+                <% else %>
+                  <span class="text-muted small">No Image</span>
+                <% end %>
               </div>
-              <span>$<%= "%.2f" % ((item.quantity * item.unit_price_cents) / 100.0) %></span>
-            </li>
-          <% end %>
-        </ul>
-        <h4 class="text-end mt-3">Total: $<%= "%.2f" % (@order.total_cents / 100.0) %></h4>
+              <div>
+                <h6 class="fw-bold text-dark mb-0"><%= item.product.name %></h6>
+                <small class="text-muted">Qty: <%= item.quantity %> × $<%= "%.2f" % (item.unit_price_cents.to_i / 100.0) %></small>
+              </div>
+            </div>
+            <span class="fw-bold text-dark">$<%= "%.2f" % ((item.unit_price_cents.to_i * item.quantity) / 100.0) %></span>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mt-3 pt-2">
+        <span class="fw-bold text-dark fs-5">Total Paid</span>
+        <span class="fw-bold text-dark fs-4">$<%= "%.2f" % (@order.total_cents.to_i / 100.0) %></span>
+      </div>
+    </div>
+
+    <!-- Shipping Details -->
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+      <h5 class="fw-bold text-dark mb-3">Shipping Details</h5>
+      <div class="text-secondary small d-flex flex-column gap-1">
+        <p class="mb-1"><strong class="text-dark">Address:</strong> <%= @order.shipping_address %></p>
+        <p class="mb-1"><strong class="text-dark">City & Postal Code:</strong> <%= @order.city %>, <%= @order.postal_code %></p>
+        <p class="mb-0"><strong class="text-dark">Phone:</strong> <%= @order.phone %></p>
       </div>
     </div>
   </div>
 
-  <div class="col-md-4">
-    <div class="card">
-      <div class="card-header">Update Order Status</div>
-      <div class="card-body">
-        <%= form_with model: [:admin, @order], method: :patch, local: true do |f| %>
-          <div class="mb-3">
-            <%= f.label :status, "Current Status:", class: "form-label" %>
-            <%= f.select :status, ["pending", "processing", "shipped", "delivered", "cancelled"], {}, class: "form-select" %>
+  <!-- Right Column: Invoice & Receipt Sidebar -->
+  <div class="col-lg-5">
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4 position-sticky" style="top: 20px;">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h5 class="fw-bold text-dark m-0">Payment Invoice</h5>
+        <button onclick="window.print();" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+          🖨️ Print
+        </button>
+      </div>
+
+      <% if @order.invoice %>
+        <div class="bg-light rounded-3 p-3 mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="text-secondary small">Invoice Status</span>
+            <span class="badge bg-success rounded-pill px-2.5 py-1 text-uppercase small"><%= @order.invoice.status %></span>
           </div>
-          <%= f.submit "Update Status", class: "btn btn-primary w-100" %>
-        <% end %>
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="text-secondary small">Email</span>
+            <span class="fw-semibold text-dark small text-truncate" style="max-width: 170px;"><%= @order.invoice.customer_email %></span>
+          </div>
+          <% if @order.invoice.stripe_payment_intent_id.present? %>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="text-secondary small">Payment ID</span>
+              <span class="font-monospace text-dark small"><%= @order.invoice.stripe_payment_intent_id.truncate(16) %></span>
+            </div>
+          <% end %>
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="text-secondary small">Issued Date</span>
+            <span class="fw-semibold text-dark small"><%= @order.invoice.created_at.strftime("%b %d, %Y") %></span>
+          </div>
+        </div>
+
+        <p class="text-muted small mb-0">This electronic receipt confirms your transaction processed through Stripe.</p>
+      <% else %>
+        <div class="alert alert-warning rounded-3 small mb-0">
+          Payment is pending. An invoice will appear here once the payment webhook is processed.
+        </div>
+      <% end %>
+
+      <div class="mt-4 pt-3 border-top">
+        <%= link_to "← Back to My Orders", orders_path, class: "btn btn-outline-dark rounded-pill w-100 fw-semibold" %>
       </div>
     </div>
   </div>

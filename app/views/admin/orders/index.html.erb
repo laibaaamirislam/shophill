@@ -1,28 +1,55 @@
-<h1>Orders</h1>
+<div class="d-flex align-items-center justify-content-between mb-4">
+  <div>
+    <h3 class="fw-bold text-dark m-0">Orders Management</h3>
+    <p class="text-secondary small m-0">Track customer purchases and update fulfillment progress</p>
+  </div>
+</div>
 
-<table class="table table-bordered">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Customer</th>
-      <th>Total</th>
-      <th>Status</th>
-      <th>Date</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @orders.each do |order| %>
-      <tr>
-        <td>#<%= order.id %></td>
-        <td><%= order.customer&.email %></td>
-        <td>$<%= "%.2f" % (order.total_cents / 100.0) %></td>
-        <td><span class="badge bg-info"><%= order.status %></span></td>
-        <td><%= order.created_at.strftime("%Y-%m-%d %H:%M") %></td>
-        <td><%= link_to "View", admin_order_path(order), class: "btn btn-sm btn-primary" %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+<!-- Status Filter Tabs -->
+<div class="mb-4 d-flex gap-2">
+  <%= link_to "All Orders", admin_orders_path, class: "btn btn-sm #{params[:status].blank? || params[:status] == 'all' ? 'btn-dark' : 'btn-outline-secondary'} rounded-pill px-3" %>
+  <%= link_to "Pending", admin_orders_path(status: 'pending'), class: "btn btn-sm #{params[:status] == 'pending' ? 'btn-dark' : 'btn-outline-secondary'} rounded-pill px-3" %>
+  <%= link_to "Shipped", admin_orders_path(status: 'shipped'), class: "btn btn-sm #{params[:status] == 'shipped' ? 'btn-dark' : 'btn-outline-secondary'} rounded-pill px-3" %>
+  <%= link_to "Completed", admin_orders_path(status: 'completed'), class: "btn btn-sm #{params[:status] == 'completed' ? 'btn-dark' : 'btn-outline-secondary'} rounded-pill px-3" %>
+  <%= link_to "Paid", admin_orders_path(status: 'paid'), class: "btn btn-sm #{params[:status] == 'paid' ? 'btn-dark' : 'btn-outline-secondary'} rounded-pill px-3" %>
+  <%= link_to "Cancelled", admin_orders_path(status: 'cancelled'), class: "btn btn-sm #{params[:status] == 'cancelled' ? 'btn-dark' : 'btn-outline-secondary'} rounded-pill px-3" %>
+</div>
 
-<%= will_paginate @orders %>
+<div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+  <% if @orders.empty? %>
+    <p class="text-muted text-center py-4 m-0">No orders found.</p>
+  <% else %>
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr class="text-secondary small text-uppercase">
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Total</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @orders.each do |order| %>
+            <tr>
+              <td class="fw-bold text-dark">#<%= order.id %></td>
+              <td class="small"><%= order.customer&.email || "Guest Customer" %></td>
+              <td class="small text-secondary"><%= order.created_at.strftime("%b %d, %Y") %></td>
+              <td>
+                <span class="badge <%= order.status == 'completed' ? 'bg-success-subtle text-success-emphasis' : order.status == 'shipped' ? 'bg-info-subtle text-info-emphasis' : 'bg-warning-subtle text-warning-emphasis' %> rounded-pill px-3 py-1">
+                  <%= order.status.capitalize %>
+                </span>
+              </td>
+              <td class="fw-bold text-dark">$<%= "%.2f" % (order.total_cents.to_i / 100.0) %></td>
+              <td class="text-end">
+                <%= link_to "View Details", admin_order_path(order), class: "btn btn-sm btn-outline-dark rounded-pill px-3" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+</div>

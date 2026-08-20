@@ -7,6 +7,6 @@ class OrdersController < ApplicationController
   end
 
   def show
-    @order = Current.customer.orders.find(params[:id])
+    @order = Current.customer.orders.includes(:order_items, :invoice).find(params[:id])
   end
 end

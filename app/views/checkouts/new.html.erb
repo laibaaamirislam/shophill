@@ -1,3 +1,5 @@
+
+
 <div class="d-flex align-items-center justify-content-between mb-4">
   <h3 class="fw-bold text-dark m-0">Checkout</h3>
   <%= link_to "← Back to Cart", cart_path, class: "text-secondary text-decoration-none fw-semibold small" %>
@@ -9,7 +11,7 @@
     <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
       <h5 class="fw-bold text-dark mb-4">Shipping Details</h5>
 
-      <%= form_with model: @order, url: checkouts_path, local: true do |f| %>
+      <%= form_with model: @order, url: checkouts_path, data: { turbo: false }, local: true do |f| %>
         <% if @order.errors.any? %>
           <div class="alert alert-danger rounded-3 mb-4">
             <ul class="mb-0 ps-3">

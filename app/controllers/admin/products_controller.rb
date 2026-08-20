@@ -23,12 +23,19 @@ module Admin
     def edit; end
 
     def update
-      if @product.update(product_params)
+
+      attributes = product_params
+      new_images = attributes.delete(:images)&.reject(&:blank?)
+
+      if @product.update(attributes)
+        @product.images.attach(new_images) if new_images.present?
+
         redirect_to admin_products_path, notice: "Product '#{@product.name}' updated successfully!"
       else
         render :edit, status: :unprocessable_entity
       end
     end
+  
 
     def toggle_active
       @product.toggle!(:active)

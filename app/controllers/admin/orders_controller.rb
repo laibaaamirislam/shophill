@@ -1,28 +1,33 @@
-# app/controllers/admin/orders_controller.rb
-class Admin::OrdersController < Admin::BaseController
-  before_action :set_order, only: [:show, :update]
+module Admin
+  class OrdersController < BaseController
+    before_action :set_order, only: [:show, :update]
 
-  def index
-    @orders = Order.includes(:customer).order(created_at: :desc).paginate(page: params[:page], per_page: 20)
-  end
-
-  def show; end
-
-  def update
-    if @order.update(order_params)
-      redirect_to admin_order_path(@order), notice: "Order status updated to #{@order.status.titleize}."
-    else
-      redirect_to admin_order_path(@order), alert: "Failed to update order status."
+    def index
+      @status = params[:status]
+      @orders = Order.includes(:customer).order(created_at: :desc)
+      @orders = @orders.where(status: @status) if @status.present? && @status != "all"
     end
-  end
 
-  private
+    def show
+      @order_items = @order.order_items.includes(:product)
+    end
 
-  def set_order
-    @order = Order.find(params[:id])
-  end
+    def update
+      if @order.update(order_params)
+        redirect_to admin_order_path(@order), notice: "Order ##{@order.id} updated to #{@order.status.capitalize}."
+      else
+        render :show, status: :unprocessable_entity
+      end
+    end
 
-  def order_params
-    params.require(:order).permit(:status)
+    private
+
+    def set_order
+      @order = Order.find(params[:id])
+    end
+
+    def order_params
+      params.require(:order).permit(:status)
+    end
   end
 end

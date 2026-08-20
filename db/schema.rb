@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_19_140554) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_20_072856) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -90,9 +90,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_19_140554) do
   create_table "invoices", force: :cascade do |t|
     t.integer "amount_cents"
     t.datetime "created_at", null: false
+    t.string "customer_email"
     t.integer "order_id", null: false
     t.string "status"
+    t.string "stripe_checkout_session_id"
     t.string "stripe_invoice_id"
+    t.string "stripe_payment_intent_id"
     t.datetime "updated_at", null: false
     t.index ["order_id"], name: "index_invoices_on_order_id"
   end
@@ -117,6 +120,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_19_140554) do
     t.string "shipping_address"
     t.string "status"
     t.string "stripe_payment_intent_id"
+    t.string "stripe_session_id"
     t.integer "total_cents"
     t.datetime "updated_at", null: false
     t.index ["customer_id"], name: "index_orders_on_customer_id"

@@ -8,7 +8,7 @@ class Admin::BaseController < ApplicationController
 
   def require_admin_login
     unless Current.admin
-      redirect_to new_admin_session_path, alert: "Admin login required"
+      redirect_to admin_login_path, alert: "Admin login required"
     end
   end
 end

@@ -15,13 +15,17 @@
   </div>
 
   <div class="row g-3 mb-3">
-    <div class="col-md-6">
+    <div class="col-md-4">
       <%= f.label :category_id, "Category", class: "form-label fw-semibold small text-secondary" %>
       <%= f.collection_select :category_id, Category.order(:name), :id, :name, { prompt: "Select Category" }, { class: "form-select rounded-3 py-2", required: true } %>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-4">
       <%= f.label :price_cents, "Price (in Cents)", class: "form-label fw-semibold small text-secondary" %>
       <%= f.number_field :price_cents, class: "form-control rounded-3 py-2", placeholder: "2999 = $29.99", required: true %>
+    </div>
+    <div class="col-md-4">
+      <%= f.label :stock_quantity, "Stock Quantity", class: "form-label fw-semibold small text-secondary" %>
+      <%= f.number_field :stock_quantity, class: "form-control rounded-3 py-2", placeholder: "10", min: 0, required: true %>
     </div>
   </div>
 
@@ -30,7 +34,6 @@
     <%= f.text_area :description, rows: 4, class: "form-control rounded-3 py-2" %>
   </div>
 
-  <!-- Multi-Image Attachment Field -->
   <div class="mb-4">
     <%= f.label :images, "Product Gallery Images", class: "form-label fw-semibold small text-secondary" %>
     

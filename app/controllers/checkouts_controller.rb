@@ -11,7 +11,6 @@ class CheckoutsController < ApplicationController
 
     customer = Current.customer
 
-    # Pre-fill order fields using saved profile information
     @order = customer.orders.build(
       shipping_address: customer.address,
       city: customer.city,
@@ -26,47 +25,66 @@ class CheckoutsController < ApplicationController
       return
     end
 
-    # Wrap order placement in a transaction to safely deduct stock
-    ActiveRecord::Base.transaction do
-      total_cents = @cart.cart_items.sum { |item| item.product.price_cents.to_i * item.quantity }
-      
-      @order = Current.customer.orders.build(order_params)
-      @order.total_cents = total_cents
-      @order.status = "pending"
+    total_cents = @cart.cart_items.sum { |item| item.product.price_cents.to_i * item.quantity }
 
-      if @order.save
-        @cart.cart_items.each do |item|
-          # Verify stock again before committing
-          if item.quantity > item.product.stock_quantity.to_i
-            raise ActiveRecord::Rollback, "Insufficient stock for #{item.product.name}"
-          end
+    @order = Current.customer.orders.build(order_params)
+    @order.total_cents = total_cents
+    @order.status = "pending"
 
-          @order.order_items.create!(
-            product: item.product,
-            quantity: item.quantity,
-            unit_price_cents: item.product.price_cents
-          )
-
-          # Deduct purchased inventory
-          item.product.update!(stock_quantity: item.product.stock_quantity - item.quantity)
-        end
-
-        # Empty cart after order is confirmed
-        @cart.cart_items.destroy_all
-
-        redirect_to order_path(@order), notice: "Order placed successfully!"
-      else
-        render :new, status: :unprocessable_entity
+    if @order.save
+      line_items = @cart.cart_items.map do |item|
+        {
+          price_data: {
+            currency: "usd",
+            product_data: { name: item.product.name },
+            unit_amount: item.product.price_cents.to_i
+          },
+          quantity: item.quantity
+        }
       end
+
+      session = Stripe::Checkout::Session.create(
+        payment_method_types: ["card"],
+        line_items: line_items,
+        mode: "payment",
+        customer_email: Current.customer.email,
+        client_reference_id: @order.id,
+        success_url: success_checkouts_url + "?session_id={CHECKOUT_SESSION_ID}",
+        cancel_url: cancel_checkouts_url
+      )
+
+      @cart.cart_items.each do |item|
+        @order.order_items.create!(
+          product: item.product,
+          quantity: item.quantity,
+          unit_price_cents: item.product.price_cents
+        )
+      end
+
+      @order.update!(stripe_session_id: session.id)
+
+      # Added status: :see_other for external POST redirects
+      redirect_to session.url, allow_other_host: true, status: :see_other
+    else
+      render :new, status: :unprocessable_entity
     end
-  rescue ActiveRecord::Rollback => e
-    redirect_to cart_path, alert: e.message
+  rescue Stripe::StripeError => e
+    redirect_to cart_path, alert: "Payment error: #{e.message}"
+  end
+
+  def success
+    @session = Stripe::Checkout::Session.retrieve(params[:session_id])
+    @order = Order.find_by(stripe_session_id: @session.id)
+  end
+
+  def cancel
+    redirect_to cart_path, alert: "Checkout was cancelled."
   end
 
   private
 
   def set_cart
-    @cart = Current.customer.cart
+    @cart = Current.customer&.cart
   end
 
   def order_params

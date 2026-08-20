@@ -11,16 +11,26 @@
 
   <body class="bg-light">
     <!-- Admin Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-3 mb-4">
-      <div class="container">
-        <%= link_to "Shophill Admin", admin_root_path, class: "navbar-brand fw-bold fs-4" %>
-        
-        <div class="d-flex align-items-center gap-3">
-          <%= link_to "Dashboard", admin_root_path, class: "nav-link text-white small fw-semibold" %>
-          <%= link_to "Products", admin_products_path, class: "nav-link text-white-50 small fw-semibold" %>
-          <%= link_to "Categories", admin_categories_path, class: "nav-link text-white-50 small fw-semibold" %>
-          <%= link_to "Orders", admin_orders_path, class: "nav-link text-white-50 small fw-semibold" %>
-        </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-3 px-4 mb-4">
+      <div class="container-fluid">
+        <span class="fw-bold text-dark fs-5">Shophill Admin</span>
+
+
+        <% if Current.admin %>
+          <div class="d-flex align-items-center gap-3 ms-auto">
+            
+            <div class="d-flex align-items-center gap-3">
+                <%= link_to "Dashboard", admin_root_path, class: "nav-link text-black small fw-semibold" %>
+                <%= link_to "Products", admin_products_path, class: "nav-link text-black-50 small fw-semibold" %>
+                <%= link_to "Categories", admin_categories_path, class: "nav-link text-black-50 small fw-semibold" %>
+                <%= link_to "Orders", admin_orders_path, class: "nav-link text-black-50 small fw-semibold" %>
+            </div>
+
+            
+            <span class="small text-secondary fw-semibold">Logged in as <%= Current.admin.name %></span>
+            <%= button_to "Log Out", admin_logout_path, method: :delete, class: "btn btn-sm btn-outline-danger rounded-pill px-3" %>
+          </div>
+        <% end %>
       </div>
     </nav>
 

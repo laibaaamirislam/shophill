@@ -1,21 +1,46 @@
-<div class="container mt-5" style="max-width: 400px;">
-  <h2>Admin Login</h2>
+<div class="row justify-content-center align-items-center min-vh-100 my-n5">
+  <div class="col-md-6 col-lg-4">
+    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+      
+      <!-- Header -->
+      <div class="text-center mb-4">
+        <div class="bg-dark text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 48px; height: 48px;">
+          <i class="bi bi-shield-lock fs-5"></i>
+        </div>
+        <h4 class="fw-bold text-dark m-0">Admin Portal</h4>
+        <p class="text-secondary small mt-1 mb-0">Sign in to manage Shophill</p>
+      </div>
 
-  <% if flash[:alert] %>
-    <div class="alert alert-danger"><%= flash[:alert] %></div>
-  <% end %>
+      <!-- Flash Alert -->
+      <% if flash[:alert] %>
+        <div class="alert alert-danger border-0 rounded-3 small py-2 px-3 mb-4 d-flex align-items-center gap-2" role="alert">
+          <i class="bi bi-exclamation-circle-fill"></i>
+          <div><%= flash[:alert] %></div>
+        </div>
+      <% end %>
 
-  <%= form_with url: admin_session_path, method: :post, local: true do |f| %>
-    <div class="mb-3">
-      <%= f.label :email, class: "form-label" %>
-      <%= f.email_field :email, class: "form-control", required: true %>
+      <!-- Form -->
+      <%= form_with url: admin_login_path, method: :post, local: true do |f| %>
+        <div class="mb-3">
+          <%= f.label :email, "Email Address", class: "form-label fw-semibold small text-secondary" %>
+          <%= f.email_field :email, class: "form-control rounded-3 py-2 px-3", placeholder: "admin@shophill.com", required: true, autofocus: true %>
+        </div>
+
+        <div class="mb-4">
+          <%= f.label :password, "Password", class: "form-label fw-semibold small text-secondary" %>
+          <%= f.password_field :password, class: "form-control rounded-3 py-2 px-3", placeholder: "••••••••", required: true %>
+        </div>
+
+        <%= f.submit "Sign In", class: "btn btn-dark w-100 py-2 rounded-pill fw-semibold shadow-sm" %>
+      <% end %>
+
+      <!-- Back to Store Link -->
+      <div class="text-center mt-4 pt-2 border-top">
+        <%= link_to root_path, class: "text-secondary text-decoration-none small hover-underline d-inline-flex align-items-center gap-1" do %>
+          &larr; Back to Storefront
+        <% end %>
+      </div>
+
     </div>
-
-    <div class="mb-3">
-      <%= f.label :password, class: "form-label" %>
-      <%= f.password_field :password, class: "form-control", required: true %>
-    </div>
-
-    <%= f.submit "Log In", class: "btn btn-primary w-100" %>
-  <% end %>
+  </div>
 </div>
